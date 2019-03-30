@@ -12,5 +12,4 @@ package com.sduwh.liutao.searchengine.contorller;
 public class IndexController {
 
 
-
 }

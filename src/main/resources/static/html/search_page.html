@@ -7,6 +7,7 @@
     <script type="text/javascript" src="../jquery/jquery.min.js"></script>
     <script src="../angular/angular.min.js" type="text/javascript"></script>
     <script type="text/javascript" src="../bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../chaos/md5.js"></script>
 </head>
 <body>
 
@@ -18,7 +19,7 @@
             </div>
             <div class="col-md-5 column">
                 <div class="form-group">
-                    <input class="form-control input-lg" type="text">
+                    <input id="keywords" class="form-control input-lg" type="text">
                 </div>
             </div>
             <div class="col-md-1 column">
@@ -28,19 +29,40 @@
             </div>
         </div>
         <div class="col-md-6 column" style="margin-top: 10px;margin-left: 150px" ng-repeat="x in results">
-            <div style="margin-bottom: 15px">
-                <h4 style="color: #0018c3">
-                    <a href="{{x.url}}"><span style="text-decoration: underline">{{x.title}}</span></a>
-                </h4>
-                <div>
-                    <img ng-if="x.hasPic" src="{{x.pic}}" align="left" style="margin-right: 10px"/>
-                    <div style="color: #0018c3">
-                        <span>{{x.summary}}</span>
+            <div name="searchResult">
+                <div style="margin-bottom: 15px">
+                    <h4 style="color: #0018c3">
+                        <a href="{{x.url}}"><span ng-bind-html="parseMyHTML(x.title)" style="text-decoration: underline"></span></a>
+                    </h4>
+                    <div>
+                        <img ng-if="x.hasPic" src="{{x.pic}}" align="left" style="margin-right: 10px;width: auto;height: auto;max-width: 150px;max-height: 100px"/>
+                        <div style="color: #0018c3">
+                            <span ng-bind-html="parseMyHTML(x.summary)"></span>
+                        </div>
+                    </div>
+                    <a style="color: green" href="{{x.url}}">{{x.source}}</a> -
+                    <span>{{x.timestamp | date:'yyyy-MM-dd hh:mm'}}</span>
+                    <a style="color: gray" href="{{x.url}}">网页快照</a>
+                </div>
+            </div>
+            <div ng-if="x.hasSame" name="sameResult" style="padding-top: 10px">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion"
+                               href="#{{x.id}}">
+                                查看与该条搜索结果相似的<span style="color: red">&nbsp;{{x.sameData.count}}&nbsp;</span>条结果
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="{{x.id}}" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <h5 style="color: #0018c3" ng-repeat="y in x.sameData.data">
+                                <a href="{{y.url}}"><span ng-bind-html="parseMyHTML(y.title)" style="text-decoration: underline">{{y.title}}</span></a>
+                            </h5>
+                        </div>
                     </div>
                 </div>
-                <a style="color: green" href="{{x.url}}">{{x.source}}</a> -
-                <span>{{x.timestamp | date:'yyyy-MM-dd hh:mm'}}</span>
-                <a style="color: gray" href="{{x.url}}">网页快照</a>
             </div>
         </div>
         <div class="col-md-6 column">
@@ -50,7 +72,21 @@
 </div>
 <script type="text/javascript">
     var app = angular.module('mainapp', []);
-    app.controller('mainCtrl', function ($scope, $http, $interval, $timeout) {
+    app.controller('mainCtrl', function ($scope, $http, $sce, $interval, $timeout) {
+        $scope.parseMyHTML = function (html) {
+            return $sce.trustAsHtml(html);
+        };
+        $scope.makeKeywordsRed = function (text, keywordList) {
+            if (keywordList === undefined || keywordList === null || keywordList.length === 0) {
+                return text;
+            }
+            keywordList.forEach (function (keyword) {
+                text = text.replace(new RegExp(keyword, "ig"), function (t) {
+                    return "<span style='color:red'>" + t + "</span>"
+                });
+            });
+            return text;
+        };
         $scope.search = function search() {
             $http({
                 method: 'GET',
@@ -58,13 +94,33 @@
             }).then(function success(data) {
                 $scope.results = data.data.data;
                 $scope.total = data.count;
-                $scope.results.forEach(function (curr) {
+                var keywords = $("#keywords").val();
+                var orginList = keywords.split(" ");
+                var keywordList = [];
+                orginList.forEach( function (curr) {
+                    if (curr !== " " && curr !== "" && curr !== undefined && curr !== null) {
+                        keywordList.push(curr);
+                    }
+                });
+                $scope.results.forEach (function (curr, index) {
                     if (curr.pic !== undefined && curr.pic != null && curr.pic !== "") {
                         curr.hasPic = true;
                     }
                     else {
                         curr.hasPic = false;
                     }
+                    if (curr.sameData !== undefined && curr.sameData != null && curr.sameData.count !== 0) {
+                        curr.hasSame = true;
+                        curr.sameData.data.forEach (function (same) {
+                            same.title = $scope.makeKeywordsRed(same.title, keywordList);
+                        });
+                    }
+                    else {
+                        curr.hasSame = false;
+                    }
+                    curr.title = $scope.makeKeywordsRed(curr.title, keywordList);
+                    curr.summary = $scope.makeKeywordsRed(curr.summary, keywordList);
+                    curr.id = index;
                 });
             }, function error() {
                 alert('连接服务器失败');

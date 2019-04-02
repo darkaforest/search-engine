@@ -1,8 +1,5 @@
 package com.sduwh.liutao.searchengine.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-
 import java.util.List;
 
 /**
@@ -12,20 +9,18 @@ import java.util.List;
  * SYS: macOS Mojave 10.14.4
  *
  * @author darkaforest
- * @date 2019/3/30 19:46
+ * @date 2019/4/2 15:21
  */
-
-@Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class SearchResultsOut {
+public class SameResultsOut {
 
     private Integer count;
-    private List<SearchResultOut> data;
 
-    public SearchResultsOut() {
+    private List<SameResultOut> data;
+
+    public SameResultsOut() {
     }
 
-    public SearchResultsOut(Integer count, List<SearchResultOut> data) {
+    public SameResultsOut(Integer count, List<SameResultOut> data) {
         this.count = count;
         this.data = data;
     }
@@ -38,11 +33,11 @@ public class SearchResultsOut {
         this.count = count;
     }
 
-    public List<SearchResultOut> getData() {
+    public List<SameResultOut> getData() {
         return data;
     }
 
-    public void setData(List<SearchResultOut> data) {
+    public void setData(List<SameResultOut> data) {
         this.data = data;
     }
 }

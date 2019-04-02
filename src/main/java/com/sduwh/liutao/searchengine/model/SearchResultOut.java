@@ -19,17 +19,19 @@ public class SearchResultOut {
     private Long timestamp;
     private String source;
     private String pic;
+    private SameResultsOut sameData;
 
     public SearchResultOut() {
     }
 
-    public SearchResultOut(String title, String summary, String url, Long timestamp, String source, String pic) {
+    public SearchResultOut(String title, String summary, String url, Long timestamp, String source, String pic, SameResultsOut sameData) {
         this.title = title;
         this.summary = summary;
         this.url = url;
         this.timestamp = timestamp;
         this.source = source;
         this.pic = pic;
+        this.sameData = sameData;
     }
 
     public String getTitle() {
@@ -78,5 +80,13 @@ public class SearchResultOut {
 
     public void setPic(String pic) {
         this.pic = pic;
+    }
+
+    public SameResultsOut getSameData() {
+        return sameData;
+    }
+
+    public void setSameData(SameResultsOut sameData) {
+        this.sameData = sameData;
     }
 }

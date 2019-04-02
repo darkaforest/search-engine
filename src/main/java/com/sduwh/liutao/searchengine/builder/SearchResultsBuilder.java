@@ -1,7 +1,6 @@
 package com.sduwh.liutao.searchengine.builder;
 
-import com.sduwh.liutao.searchengine.model.SearchResultOut;
-import com.sduwh.liutao.searchengine.model.SearchResultsOut;
+import com.sduwh.liutao.searchengine.model.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -27,6 +26,17 @@ public class SearchResultsBuilder {
         SearchResultsOut results = new SearchResultsOut();
         results.setCount(from.size());
         results.setData(from);
+        return results;
+    }
+
+    public SearchResultsOut build(List<SearchResultOut> from, List<SameResultOut> sameList) {
+        SearchResultsOut results = build(from);
+        if (sameList == null || sameList.isEmpty()) {
+            return results;
+        }
+        SameResultsOut sameResultsOut = new SameResultsOut();
+        sameResultsOut.setCount(sameList.size());
+        sameResultsOut.setData(sameList);
         return results;
     }
 

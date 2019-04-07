@@ -1,10 +1,8 @@
 package com.sduwh.liutao.searchengine.contorller;
 
 import com.sduwh.liutao.searchengine.builder.SearchResultsBuilder;
-import com.sduwh.liutao.searchengine.model.SameResultOut;
-import com.sduwh.liutao.searchengine.model.SameResultsOut;
-import com.sduwh.liutao.searchengine.model.SearchResultOut;
-import com.sduwh.liutao.searchengine.model.SearchResultsOut;
+import com.sduwh.liutao.searchengine.builder.SuggestionsBuilder;
+import com.sduwh.liutao.searchengine.model.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -58,6 +56,19 @@ public class TestController {
         s1.setSameData(sameResultsOut);
         s2.setSameData(sameResultsOut);
         return new SearchResultsBuilder().build(list, sameList);
+    }
+
+    @RequestMapping(value = "/test/suggest", method = RequestMethod.GET)
+    public SuggestionsOut testSuggest() {
+        List<String> items = new ArrayList<>();
+        items.add("自动补全测试1");
+        items.add("自动补全测试2");
+        items.add("自动补全测试3");
+        items.add("自动补全测试4");
+        items.add("自动补全测试5");
+        items.add("aaa");
+        items.add("bbb");
+        return new SuggestionsBuilder().build(items);
     }
 
 }

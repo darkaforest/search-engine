@@ -18,9 +18,9 @@
                 <img src="https://www.baidu.com/img/baidu_resultlogo@2.png" width="100%"/>
             </div>
             <div class="col-md-5 column">
-                <div class="form-group">
-                    <input id="keywords" class="form-control input-lg" type="text">
-                </div>
+                <input ng-change="suggest()" ng-model="keyWords" list="list" id="keywords" type="text"
+                       class="form-control input-lg" autocomplete="off">
+                <datalist id="list"></datalist>
             </div>
             <div class="col-md-1 column">
                 <button type="button" class="btn btn-primary btn-lg " ng-click="search()">立即搜索</button>
@@ -32,10 +32,12 @@
             <div name="searchResult">
                 <div style="margin-bottom: 15px">
                     <h4 style="color: #0018c3">
-                        <a href="{{x.url}}"><span ng-bind-html="parseMyHTML(x.title)" style="text-decoration: underline"></span></a>
+                        <a href="{{x.url}}"><span ng-bind-html="parseMyHTML(x.title)"
+                                                  style="text-decoration: underline"></span></a>
                     </h4>
                     <div>
-                        <img ng-if="x.hasPic" src="{{x.pic}}" align="left" style="margin-right: 10px;width: auto;height: auto;max-width: 150px;max-height: 100px"/>
+                        <img ng-if="x.hasPic" src="{{x.pic}}" align="left"
+                             style="margin-right: 10px;width: auto;height: auto;max-width: 150px;max-height: 100px"/>
                         <div style="color: #0018c3">
                             <span ng-bind-html="parseMyHTML(x.summary)"></span>
                         </div>
@@ -58,7 +60,8 @@
                     <div id="{{x.id}}" class="panel-collapse collapse">
                         <div class="panel-body">
                             <h5 style="color: #0018c3" ng-repeat="y in x.sameData.data">
-                                <a href="{{y.url}}"><span ng-bind-html="parseMyHTML(y.title)" style="text-decoration: underline">{{y.title}}</span></a>
+                                <a href="{{y.url}}"><span ng-bind-html="parseMyHTML(y.title)"
+                                                          style="text-decoration: underline">{{y.title}}</span></a>
                             </h5>
                         </div>
                     </div>
@@ -73,60 +76,94 @@
 <script type="text/javascript">
     var app = angular.module('mainapp', []);
     app.controller('mainCtrl', function ($scope, $http, $sce, $interval, $timeout) {
-        $scope.parseMyHTML = function (html) {
-            return $sce.trustAsHtml(html);
-        };
-        $scope.makeKeywordsRed = function (text, keywordList) {
-            if (keywordList === undefined || keywordList === null || keywordList.length === 0) {
-                return text;
-            }
-            keywordList.forEach (function (keyword) {
-                text = text.replace(new RegExp(keyword, "ig"), function (t) {
-                    return "<span style='color:red'>" + t + "</span>"
+            $scope.parseMyHTML = function (html) {
+                return $sce.trustAsHtml(html);
+            };
+            $scope.makeKeywordsRed = function (text, keywordList) {
+                if (keywordList === undefined || keywordList === null || keywordList.length === 0) {
+                    return text;
+                }
+                keywordList.forEach(function (keyword) {
+                    text = text.replace(new RegExp(keyword, "ig"), function (t) {
+                        return "<span style='color:red'>" + t + "</span>"
+                    });
                 });
-            });
-            return text;
-        };
-        $scope.search = function search() {
-            $http({
-                method: 'GET',
-                url: '/test/search'
-            }).then(function success(data) {
-                $scope.results = data.data.data;
-                $scope.total = data.count;
+                return text;
+            };
+            $scope.getKeyWords = function getKeyWords() {
                 var keywords = $("#keywords").val();
-                var orginList = keywords.split(" ");
+                var originList = keywords.split(" ");
                 var keywordList = [];
-                orginList.forEach( function (curr) {
+                originList.forEach(function (curr) {
                     if (curr !== " " && curr !== "" && curr !== undefined && curr !== null) {
                         keywordList.push(curr);
                     }
                 });
-                $scope.results.forEach (function (curr, index) {
-                    if (curr.pic !== undefined && curr.pic != null && curr.pic !== "") {
-                        curr.hasPic = true;
-                    }
-                    else {
-                        curr.hasPic = false;
-                    }
-                    if (curr.sameData !== undefined && curr.sameData != null && curr.sameData.count !== 0) {
-                        curr.hasSame = true;
-                        curr.sameData.data.forEach (function (same) {
-                            same.title = $scope.makeKeywordsRed(same.title, keywordList);
+                return originList;
+            };
+            $scope.suggest = function suggest() {
+                var selectDom = $("#list");
+                selectDom.empty();
+                $http({
+                    method: 'GET',
+                    url: '/test/suggest'
+                }).then(function success(data) {
+                    data.data.suggestions.forEach(function (curr) {
+                        selectDom.append("<option value=" + curr + "></option>")
+                    });
+                }, function error() {
+                    alert('连接服务器失败');
+                });
+                $("#keywords").typeahead({
+                    source: function (query, process) {
+                        return $.get('/test/suggest', function (data) {
+                            process(data.suggestions);
                         });
                     }
-                    else {
-                        curr.hasSame = false;
-                    }
-                    curr.title = $scope.makeKeywordsRed(curr.title, keywordList);
-                    curr.summary = $scope.makeKeywordsRed(curr.summary, keywordList);
-                    curr.id = index;
                 });
-            }, function error() {
-                alert('连接服务器失败');
-            });
+            };
+            $scope.search = function search() {
+                $http({
+                    method: 'GET',
+                    url: '/test/search'
+                }).then(function success(data) {
+                    $scope.results = data.data.data;
+                    $scope.total = data.count;
+                    var keywords = $("#keywords").val();
+                    var orginList = keywords.split(" ");
+                    var keywordList = [];
+                    orginList.forEach(function (curr) {
+                        if (curr !== " " && curr !== "" && curr !== undefined && curr !== null) {
+                            keywordList.push(curr);
+                        }
+                    });
+                    $scope.results.forEach(function (curr, index) {
+                        if (curr.pic !== undefined && curr.pic != null && curr.pic !== "") {
+                            curr.hasPic = true;
+                        }
+                        else {
+                            curr.hasPic = false;
+                        }
+                        if (curr.sameData !== undefined && curr.sameData != null && curr.sameData.count !== 0) {
+                            curr.hasSame = true;
+                            curr.sameData.data.forEach(function (same) {
+                                same.title = $scope.makeKeywordsRed(same.title, keywordList);
+                            });
+                        }
+                        else {
+                            curr.hasSame = false;
+                        }
+                        curr.title = $scope.makeKeywordsRed(curr.title, keywordList);
+                        curr.summary = $scope.makeKeywordsRed(curr.summary, keywordList);
+                        curr.id = index;
+                    });
+                }, function error() {
+                    alert('连接服务器失败');
+                });
+            }
         }
-    });
+    )
+    ;
 </script>
 </body>
 </html>

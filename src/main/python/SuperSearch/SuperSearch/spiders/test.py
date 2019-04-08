@@ -4,11 +4,9 @@ import time
 
 import scrapy
 
-import mysql.connector
+import psycopg2
 
 import uuid
-
-import logging
 
 
 class testSpider(scrapy.Spider):
@@ -18,20 +16,7 @@ class testSpider(scrapy.Spider):
     got_urls = []
 
     def __init__(self):
-        config = {
-            'host': '127.0.0.1',
-            'user': 'root',
-            'password': 'local-test-pwd',
-            'port': 3306,
-            'database': 'super_search',
-            'charset': 'utf8'
-        }
-
-        try:
-            self.conn = mysql.connector.connect(**config)
-        except mysql.connector.Error as e:
-            print('connect fail! {}'.format(e))
-
+        self.conn = psycopg2.connect(database="search-engine", user="root", password="local-test-pwd", host="127.0.0.1", port="5432")
         self.cursor = self.conn.cursor()
         self.depth = 0
         self.num = 0
@@ -58,11 +43,8 @@ class testSpider(scrapy.Spider):
         self.depth += 1
         self.num += 1
         print ('@count: %d @layer : %d @length : %d\n@url : %s' %
-               (self.num, self.depth, len(response.body), response.url))
-        try:
-            self.cursor.execute('insert into s_raw_data (id, s_time, s_depth, s_length, s_url, s_title, s_content) values (%s, %s, %s, %s, %s, %s, %s)', (str(uuid.uuid1()), int(round(time.time() * 1000)), self.depth, len(response.body), response.url, response.xpath('//title').extract()[0][0:128], response.xpath('//body').extract()[0]))
-        except mysql.connector.Error as e:
-            print('insert fail! {}'.format(e))
+               (self.num, self.depth, len(response.text), response.url))
+        self.cursor.execute('insert into s_raw_data (id, s_time, s_depth, s_length, s_url, s_title, s_content) values (%s, %s, %s, %s, %s, %s, %s)', (str(uuid.uuid1()), int(round(time.time() * 1000)), self.depth, len(response.body), response.url, response.xpath('//title').extract()[0][0:128], response.text))
         next_urls = response.xpath('//a/@href').extract()
         for next_url in next_urls:
             if next_url.startswith('http'):

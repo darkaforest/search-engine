@@ -18,6 +18,8 @@ public class SimhashUtils {
 
     private static final int HASH_BIT_LENGTH = 64;
 
+    private static final int HASH_MAP_MIN_CAPACITY = 1024;
+
     private static final int HASH_MAP_INITIAL_CAPACITY = 1024;
 
     private static final int RADIX = 2;
@@ -32,7 +34,7 @@ public class SimhashUtils {
 
     private static Map<String, Integer> wordCounts(List<String> words) {
         if (words == null || words.isEmpty()) {
-            return new HashMap<>(HASH_MAP_INITIAL_CAPACITY);
+            return new HashMap<>(HASH_MAP_MIN_CAPACITY);
         }
         Map<String, Integer> map = new HashMap<>(HASH_MAP_INITIAL_CAPACITY);
         for (String word : words) {
@@ -51,7 +53,7 @@ public class SimhashUtils {
                     v[i] += word2count.getValue();
                 }
                 else {
-                    v[i] += -word2count.getValue();
+                    v[i] -= word2count.getValue();
                 }
             }
         }
@@ -110,7 +112,7 @@ public class SimhashUtils {
             if (x.equals(new BigInteger("-1"))) {
                 x = new BigInteger("-2");
             }
-            return add0toStr(Long.toBinaryString(x.longValue()));
+            return long2binary(x.longValue());
         }
     }
 }

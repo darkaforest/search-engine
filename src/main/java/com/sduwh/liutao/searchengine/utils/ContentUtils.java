@@ -17,8 +17,12 @@ public class ContentUtils {
 
     private static final Pattern PATTERN = Pattern.compile("(?<=[\\x{4e00}-\\x{9fa5}])\\s+(?=[\\x{4e00}-\\x{9fa5}])");
 
-    public static String getContent(String html) throws Exception {
-        return ContentExtractor.getContentByHtml(html).replace("　", "");
+    public static String getContent(String html){
+        try {
+            return ContentExtractor.getContentByHtml(html).replace("　", "");
+        } catch (Exception e) {
+            return "";
+        }
     }
 
 }

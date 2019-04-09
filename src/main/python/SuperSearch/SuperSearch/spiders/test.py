@@ -8,6 +8,8 @@ import psycopg2
 
 import uuid
 
+import re
+
 
 class testSpider(scrapy.Spider):
     name = 'test'
@@ -44,7 +46,7 @@ class testSpider(scrapy.Spider):
         self.num += 1
         print ('@count: %d @layer : %d @length : %d\n@url : %s' %
                (self.num, self.depth, len(response.text), response.url))
-        self.cursor.execute('insert into s_raw_data (id, s_time, s_depth, s_length, s_url, s_title, s_content) values (%s, %s, %s, %s, %s, %s, %s)', (str(uuid.uuid1()), int(round(time.time() * 1000)), self.depth, len(response.body), response.url, response.xpath('//title').extract()[0][0:128], response.text))
+        self.cursor.execute('insert into s_raw_data (id, s_time, s_depth, s_length, s_url, s_title, s_content) values (%s, %s, %s, %s, %s, %s, %s)', (str(uuid.uuid1()), int(round(time.time() * 1000)), self.depth, len(response.body), response.url, re.sub('<[^<]+?>', '', response.xpath('//title').extract()[0])[0:128], response.text))
         next_urls = response.xpath('//a/@href').extract()
         for next_url in next_urls:
             if next_url.startswith('http'):

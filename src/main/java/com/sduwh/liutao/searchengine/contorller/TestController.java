@@ -3,6 +3,8 @@ package com.sduwh.liutao.searchengine.contorller;
 import com.sduwh.liutao.searchengine.builder.SearchResultsBuilder;
 import com.sduwh.liutao.searchengine.builder.SuggestionsBuilder;
 import com.sduwh.liutao.searchengine.model.*;
+import com.sduwh.liutao.searchengine.utils.RedisUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +24,9 @@ import java.util.List;
 
 @RestController
 public class TestController {
+
+    @Autowired
+    private RedisUtils redisUtils;
 
     @RequestMapping(value = "/test/search", method = RequestMethod.GET)
     public SearchResultsOut testSearch() {
@@ -69,6 +74,16 @@ public class TestController {
         items.add("aaa");
         items.add("bbb");
         return new SuggestionsBuilder().build(items);
+    }
+
+    @RequestMapping(value = "/test/redis", method = RequestMethod.GET)
+    public void testRedis() {
+        redisUtils.getRedis().opsForValue().set("aaa", "bbb");
+        redisUtils.getRedis().opsForValue().set("ccc", "ddd");
+        System.out.println(redisUtils.getRedis().opsForValue().get("aaa"));
+        redisUtils.getRedis().delete("aaa");
+        System.out.println(redisUtils.getRedis().opsForValue().get("ccc"));
+        System.out.println(redisUtils.getRedis().opsForValue().get("aaa"));
     }
 
 }

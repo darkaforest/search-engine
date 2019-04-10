@@ -3,6 +3,7 @@ package com.sduwh.liutao.searchengine.service;
 import com.sduwh.liutao.searchengine.builder.SearchDataBuilder;
 import com.sduwh.liutao.searchengine.dao.RawDataRepository;
 import com.sduwh.liutao.searchengine.dao.SearchDataRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,7 @@ import java.util.List;
  * @date 2019/4/9 17:03
  */
 
+@Slf4j
 @Component
 public class BuildService {
 
@@ -37,17 +39,12 @@ public class BuildService {
 
     @Transactional(rollbackFor = Exception.class)
     public void buildTransactional() {
-        System.out.println("start time: " + new Date(System.currentTimeMillis()));
+        log.info("start time: " + new Date(System.currentTimeMillis()));
         List<Object> list = rawDataRepository.findAllId();
-        int i = 0;
         for (Object id : list) {
-            if (i >= 10000) {
-                break;
-            }
             searchDataRepository.save(new SearchDataBuilder().build(rawDataRepository.findById((String) id).orElse(null)));
-            i++;
         }
-        System.out.println("end time: " + new Date(System.currentTimeMillis()));
+        log.info("end time: " + new Date(System.currentTimeMillis()));
     }
 
 }

@@ -47,6 +47,9 @@ public class SearchData {
     @Column(name = "s_raw_id")
     private String rawId;
 
+    @Transient
+    private int relevancy;
+
     public SearchData() {
     }
 
@@ -131,6 +134,14 @@ public class SearchData {
 
     public void setRawId(String rawId) {
         this.rawId = rawId;
+    }
+
+    public int getRelevancy() {
+        return relevancy;
+    }
+
+    public void setRelevancy(int relevancy) {
+        this.relevancy = relevancy;
     }
 
     @Override

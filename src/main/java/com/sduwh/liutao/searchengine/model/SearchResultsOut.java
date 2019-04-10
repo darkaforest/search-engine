@@ -3,6 +3,7 @@ package com.sduwh.liutao.searchengine.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,6 +24,8 @@ public class SearchResultsOut {
     private List<SearchResultOut> data;
 
     public SearchResultsOut() {
+        this.count = 0;
+        this.data = new ArrayList<>();
     }
 
     public SearchResultsOut(Integer count, List<SearchResultOut> data) {

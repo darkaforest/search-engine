@@ -19,8 +19,8 @@ import java.util.List;
 public class SearchResultsBuilder {
 
     public SearchResultsOut build(List<SearchResultOut> from) {
-        if (from == null || from.isEmpty()) {
-            log.error("[build] build SearchResultsOut fail, para is null or empty");
+        if (from == null) {
+            log.error("[build] build SearchResultsOut fail, para is null");
             return new SearchResultsOut();
         }
         SearchResultsOut results = new SearchResultsOut();

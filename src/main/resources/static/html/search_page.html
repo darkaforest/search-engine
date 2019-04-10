@@ -114,20 +114,19 @@
                 }, function error() {
                     alert('连接服务器失败');
                 });
-                $("#keywords").typeahead({
-                    source: function (query, process) {
-                        return $.get('/test/suggest', function (data) {
-                            process(data.suggestions);
-                        });
-                    }
-                });
             };
             $scope.search = function search() {
                 $http({
                     method: 'GET',
-                    url: '/test/search'
+                    url: '/search',
+                    params: {
+                        query : $("#keywords").val()
+                    }
                 }).then(function success(data) {
                     $scope.results = data.data.data;
+                    if ($scope.results === null) {
+                        $scope.results = [];
+                    }
                     $scope.total = data.count;
                     var keywords = $("#keywords").val();
                     var orginList = keywords.split(" ");
@@ -138,6 +137,9 @@
                         }
                     });
                     $scope.results.forEach(function (curr, index) {
+                        if (curr.source === null || curr.source === undefined || curr.source === "") {
+                            curr.source = "默认来源";
+                        }
                         if (curr.pic !== undefined && curr.pic != null && curr.pic !== "") {
                             curr.hasPic = true;
                         }

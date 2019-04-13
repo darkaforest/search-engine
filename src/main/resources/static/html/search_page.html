@@ -106,7 +106,10 @@
                 selectDom.empty();
                 $http({
                     method: 'GET',
-                    url: '/test/suggest'
+                    url: '/keywords/get',
+                    params: {
+                        key : $("#keywords").val()
+                    }
                 }).then(function success(data) {
                     data.data.suggestions.forEach(function (curr) {
                         selectDom.append("<option value=" + curr + "></option>")
@@ -116,11 +119,19 @@
                 });
             };
             $scope.search = function search() {
+                var keyword = $("#keywords").val();
+                $http({
+                    method: 'GET',
+                    url: '/keyword/put',
+                    params: {
+                        key : keyword
+                    }
+                });
                 $http({
                     method: 'GET',
                     url: '/search',
                     params: {
-                        query : $("#keywords").val()
+                        query : keyword
                     }
                 }).then(function success(data) {
                     $scope.results = data.data.data;
@@ -164,8 +175,7 @@
                 });
             }
         }
-    )
-    ;
+    );
 </script>
 </body>
 </html>

@@ -2,8 +2,10 @@ package com.sduwh.liutao.searchengine.dao;
 
 import com.sduwh.liutao.searchengine.entity.SearchData;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,5 +22,16 @@ public interface SearchDataRepository extends JpaRepository<SearchData, String> 
 
     @Query(value = "select * from s_search_data where to_tsvector('chinese', s_title || s_content) @@ plainto_tsquery('chinese', ?1)", nativeQuery = true)
     List<SearchData> findByTextSearch(@Param("query") String query);
+
+    @Query(value = "select id, s_simhash from s_search_data", nativeQuery = true)
+    List<Object[]> findAllIdAndSimhash();
+
+    @Query
+    List<SearchData> findBySimhash(Long simhash);
+
+    @Query
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    void deleteBySimhash(Long simhash);
 
 }

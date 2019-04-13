@@ -1,8 +1,12 @@
 package com.sduwh.liutao.searchengine.builder;
 
 import com.sduwh.liutao.searchengine.entity.SearchData;
+import com.sduwh.liutao.searchengine.model.SameResultOut;
 import com.sduwh.liutao.searchengine.model.SearchResultOut;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA 2018.1.5 (Ultimate Edition)
@@ -25,9 +29,17 @@ public class SearchResultBuilder {
         return build(from, new String[0]);
     }
 
+    public SearchResultOut build(SearchData from, List<SearchData> sames) {
+        return build(from, sames, new String[0]);
+    }
+
     public SearchResultOut build(SearchData from, String[] keywords) {
         return build(from, keywords, DEFAULT_UNI_LENGTH);
     }
+    public SearchResultOut build(SearchData from, List<SearchData> sames, String[] keywords) {
+        return build(from, sames, keywords, DEFAULT_UNI_LENGTH);
+    }
+
 
     public SearchResultOut build(SearchData from, String[] keywords, int uniLength) {
         if (from == null) {
@@ -52,6 +64,19 @@ public class SearchResultBuilder {
         int length = firstFoundIndex + uniLength > preContent.length() ? preContent.length() - firstFoundIndex - 1 : uniLength;
         String uniContent = preContent.substring(firstFoundIndex, firstFoundIndex + length);
         return new SearchResultOut(from.getTitle(), uniContent, from.getUrl(), from.getTime(), from.getSource(), from.getImgUrl(), null);
+    }
+
+    public SearchResultOut build(SearchData from, List<SearchData> sames, String[] keywords, int uniLength) {
+        SearchResultOut result = build(from, keywords, uniLength);
+        if (sames == null || sames.isEmpty()) {
+            return result;
+        }
+        List<SameResultOut> sameResultOuts = new ArrayList<>();
+        for (SearchData same : sames) {
+            sameResultOuts.add(new SameResultOut(same.getTitle(), same.getUrl()));
+        }
+        result.setSameData(new SameResultsBuilder().build(sameResultOuts));
+        return result;
     }
 
 }

@@ -13,8 +13,8 @@ import re
 
 class testSpider(scrapy.Spider):
     name = 'test'
-    allowed_domains = ['news.sina.com.cn']
-    start_urls = ['https://news.sina.com.cn/']
+    allowed_domains = ['news.ifeng.com', 'news.163.com', 'xinhuanet.com', 'chinanews.com']
+    start_urls = ['http://news.ifeng.com', 'https://news.163.com/', 'http://www.xinhuanet.com', 'http://www.chinanews.com']
     got_urls = []
 
     def __init__(self):
@@ -36,7 +36,7 @@ class testSpider(scrapy.Spider):
             self.conn.commit()
             print 'commit while running'
             self.save_ddl = 100
-        if self.num >= 100000:
+        if self.num >= 500000:
             self.conn.commit()
             print 'crawler done'
             self.cursor.close()

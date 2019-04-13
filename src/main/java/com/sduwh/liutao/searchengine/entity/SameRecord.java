@@ -30,12 +30,12 @@ public class SameRecord {
     private String sameId;
 
     @Column(name = "s_hd")
-    private String hammingDis;
+    private int hammingDis;
 
     public SameRecord() {
     }
 
-    public SameRecord(String originId, String sameId, String hammingDis) {
+    public SameRecord(String originId, String sameId, int hammingDis) {
         this.originId = originId;
         this.sameId = sameId;
         this.hammingDis = hammingDis;
@@ -65,11 +65,11 @@ public class SameRecord {
         this.sameId = sameId;
     }
 
-    public String getHammingDis() {
+    public int getHammingDis() {
         return hammingDis;
     }
 
-    public void setHammingDis(String hammingDis) {
+    public void setHammingDis(int hammingDis) {
         this.hammingDis = hammingDis;
     }
 

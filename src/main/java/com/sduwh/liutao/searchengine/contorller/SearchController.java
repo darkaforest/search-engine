@@ -24,16 +24,24 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SearchController {
 
+    private static final int DEFAULT_PAGE_SIZE = 20;
+
     @Autowired
     private SearchService searchService;
 
     @RequestMapping(value = "/search", method = RequestMethod.GET)
-    public SearchResultsOut search(@RequestParam(name = "query", required = false) String query) {
+    public SearchResultsOut search(@RequestParam(name = "query", required = false) String query, @RequestParam(name = "pageIndex", required = false) Integer pageIndex, @RequestParam(name = "pageSize", required = false) Integer pageSize) {
         log.info("[search] search with : {}", query);
         if (StringUtils.isEmpty(query)) {
             return new SearchResultsOut();
         }
-        return searchService.search(query);
+        if (pageIndex == null || pageIndex < 1) {
+            pageIndex = 1;
+        }
+        if (pageSize == null || pageSize < 1) {
+            pageSize = DEFAULT_PAGE_SIZE;
+        }
+        return searchService.search(query, pageIndex, pageSize);
     }
 
 }

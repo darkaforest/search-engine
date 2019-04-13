@@ -2,7 +2,9 @@ package com.sduwh.liutao.searchengine.service;
 
 import com.sduwh.liutao.searchengine.builder.SearchResultBuilder;
 import com.sduwh.liutao.searchengine.builder.SearchResultsBuilder;
+import com.sduwh.liutao.searchengine.dao.SameRecordRepository;
 import com.sduwh.liutao.searchengine.dao.SearchDataRepository;
+import com.sduwh.liutao.searchengine.entity.SameRecord;
 import com.sduwh.liutao.searchengine.entity.SearchData;
 import com.sduwh.liutao.searchengine.model.SearchResultOut;
 import com.sduwh.liutao.searchengine.model.SearchResultsOut;
@@ -30,7 +32,10 @@ public class SearchService {
     @Autowired
     private SearchDataRepository searchDataRepository;
 
-    public SearchResultsOut search(String query) {
+    @Autowired
+    private SameRecordRepository sameRecordRepository;
+
+    public SearchResultsOut search(String query, Integer pageIndex, Integer pageSize) {
         //TO DO  匹配度算法有问题，应该统计出现次数而不是是否出现，考虑效率问题暂todo
         if (StringUtils.isEmpty(query)) {
             return new SearchResultsOut();
@@ -57,9 +62,23 @@ public class SearchService {
             orderList.add(preData);
         }
         orderList.sort(Comparator.comparing(SearchData::getRelevancy).reversed());
+        int startIndex = (pageIndex - 1) * pageSize;
+        //not included
+        int toIndex = startIndex + pageSize > orderList.size() ? orderList.size() : startIndex + pageSize;
+        List<SearchData> view = orderList.subList(startIndex, toIndex);
         List<SearchResultOut> results = new ArrayList<>();
-        for (SearchData orderData : orderList) {
-            results.add(new SearchResultBuilder().build(orderData));
+        for (SearchData orderData : view) {
+            List<SameRecord> sameRecords = sameRecordRepository.findByOrOriginId(orderData.getId());
+            List<SearchData> sameData = new ArrayList<>();
+            if (sameRecords != null && !sameRecords.isEmpty()) {
+                for (SameRecord sameRecord : sameRecords) {
+                    if (sameRecord.getHammingDis() > 3) {
+                        continue;
+                    }
+                    sameData.add(searchDataRepository.findById(sameRecord.getSameId()).orElse(null));
+                }
+            }
+            results.add(new SearchResultBuilder().build(orderData, sameData));
         }
         return new SearchResultsBuilder().build(results);
     }

@@ -50,30 +50,30 @@ public class BuildService {
 
     @Transactional(rollbackFor = Exception.class)
     public void buildTransactional() {
-//        log.info("[buildTransactional] start clean search data @ {}", new Date(System.currentTimeMillis()));
-//        searchDataRepository.deleteAll();
-//        log.info("[buildTransactional] end clean search data @ {}", new Date(System.currentTimeMillis()));
-//        log.info("[buildTransactional] start gen search data @ {}", new Date(System.currentTimeMillis()));
-//        List<Object> list = rawDataRepository.findAllId();
-//        Map<Long, Integer> simCountMap = new HashMap<>(list.size() / 2);
-//        for (Object id : list) {
-//            SearchData searchData = new SearchDataBuilder().build(rawDataRepository.findById((String) id).orElse(null));
-//            if (searchData.getSimhash() == 0) {
-//                continue;
-//            }
-//            simCountMap.merge(searchData.getSimhash(), 1,  (oldVal, newVal) -> oldVal + 1);
-//            searchDataRepository.save(searchData);
-//        }
-//        log.info("[buildTransactional] end gen search data @ {}", new Date(System.currentTimeMillis()));
-//        log.info("[buildTransactional] start spam data remove @ {}", new Date(System.currentTimeMillis()));
-//        for (Map.Entry<Long, Integer> simCount : simCountMap.entrySet()) {
-//            if (simCount.getValue() > SPAM_LIMIT) {
-//                List<SearchData> temp = searchDataRepository.findBySimhash(simCount.getKey());
-//                searchDataRepository.deleteBySimhash(simCount.getKey());
-//                searchDataRepository.save(temp.get(0));
-//            }
-//        }
-//        log.info("[buildTransactional] end spam data remove @ {}", new Date(System.currentTimeMillis()));
+        log.info("[buildTransactional] start clean search data @ {}", new Date(System.currentTimeMillis()));
+        searchDataRepository.deleteAll();
+        log.info("[buildTransactional] end clean search data @ {}", new Date(System.currentTimeMillis()));
+        log.info("[buildTransactional] start gen search data @ {}", new Date(System.currentTimeMillis()));
+        List<Object> list = rawDataRepository.findAllId();
+        Map<Long, Integer> simCountMap = new HashMap<>(list.size() / 2);
+        for (Object id : list) {
+            SearchData searchData = new SearchDataBuilder().build(rawDataRepository.findById((String) id).orElse(null));
+            if (searchData.getSimhash() == 0) {
+                continue;
+            }
+            simCountMap.merge(searchData.getSimhash(), 1,  (oldVal, newVal) -> oldVal + 1);
+            searchDataRepository.save(searchData);
+        }
+        log.info("[buildTransactional] end gen search data @ {}", new Date(System.currentTimeMillis()));
+        log.info("[buildTransactional] start spam data remove @ {}", new Date(System.currentTimeMillis()));
+        for (Map.Entry<Long, Integer> simCount : simCountMap.entrySet()) {
+            if (simCount.getValue() > SPAM_LIMIT) {
+                List<SearchData> temp = searchDataRepository.findBySimhash(simCount.getKey());
+                searchDataRepository.deleteBySimhash(simCount.getKey());
+                searchDataRepository.save(temp.get(0));
+            }
+        }
+        log.info("[buildTransactional] end spam data remove @ {}", new Date(System.currentTimeMillis()));
         calculateSame();
     }
 

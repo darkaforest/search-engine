@@ -18,19 +18,19 @@ import java.util.List;
 @Slf4j
 public class SearchResultsBuilder {
 
-    public SearchResultsOut build(List<SearchResultOut> from) {
+    public SearchResultsOut build(List<SearchResultOut> from, int count) {
         if (from == null) {
             log.error("[build] build SearchResultsOut fail, para is null");
             return new SearchResultsOut();
         }
         SearchResultsOut results = new SearchResultsOut();
-        results.setCount(from.size());
+        results.setCount(count);
         results.setData(from);
         return results;
     }
 
-    public SearchResultsOut build(List<SearchResultOut> from, List<SameResultOut> sameList) {
-        SearchResultsOut results = build(from);
+    public SearchResultsOut build(List<SearchResultOut> from, List<SameResultOut> sameList, int count) {
+        SearchResultsOut results = build(from, count);
         if (sameList == null || sameList.isEmpty()) {
             return results;
         }

@@ -13,69 +13,131 @@
 
 <div ng-app="mainapp">
     <div ng-controller="mainCtrl">
-        <div class="row clearfix" style="margin-top: 10px;margin-left: 10px">
-            <div class="col-md-1 column">
-                <img src="https://www.baidu.com/img/baidu_resultlogo@2.png" width="100%"/>
-            </div>
-            <div class="col-md-5 column">
-                <input ng-change="suggest()" ng-model="keyWords" list="list" id="keywords" type="text"
-                       class="form-control input-lg" autocomplete="off">
-                <datalist id="list"></datalist>
-            </div>
-            <div class="col-md-1 column">
-                <button type="button" class="btn btn-primary btn-lg " ng-click="search()">立即搜索</button>
-            </div>
-            <div class="col-md-5 column">
-            </div>
-        </div>
-        <div class="col-md-6 column" style="margin-top: 10px;margin-left: 150px" ng-repeat="x in results">
-            <div name="searchResult">
-                <div style="margin-bottom: 15px">
-                    <h4 style="color: #0018c3">
-                        <a href="{{x.url}}"><span ng-bind-html="parseMyHTML(x.title)"
-                                                  style="text-decoration: underline"></span></a>
-                    </h4>
-                    <div>
-                        <img ng-if="x.hasPic" src="{{x.pic}}" align="left"
-                             style="margin-right: 10px;width: auto;height: auto;max-width: 150px;max-height: 100px"/>
-                        <div style="color: #0018c3">
-                            <span ng-bind-html="parseMyHTML(x.summary)"></span>
-                        </div>
-                    </div>
-                    <a style="color: green" href="{{x.url}}">{{x.source}}</a> -
-                    <span>{{x.timestamp | date:'yyyy-MM-dd hh:mm'}}</span>
-                    <a style="color: gray" href="{{x.url}}">网页快照</a>
+        <div>
+            <div class="row clearfix" style="margin-top: 10px;margin-left: 10px">
+                <div class="col-md-1 column">
+                    <img src="https://www.baidu.com/img/baidu_resultlogo@2.png" width="100%"/>
+                </div>
+                <div class="col-md-5 column">
+                    <input ng-change="suggest()" ng-model="keyWords" list="list" id="keywords" type="text"
+                           class="form-control input-lg" autocomplete="off">
+                    <datalist id="list"></datalist>
+                </div>
+                <div class="col-md-1 column">
+                    <button type="button" class="btn btn-primary btn-lg " ng-click="search()">立即搜索</button>
+                </div>
+                <div class="col-md-5 column">
                 </div>
             </div>
-            <div ng-if="x.hasSame" name="sameResult" style="padding-top: 10px">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion"
-                               href="#{{x.id}}">
-                                查看与该条搜索结果相似的<span style="color: red">&nbsp;{{x.sameData.count}}&nbsp;</span>条结果
-                            </a>
+            <div class="col-md-6 column" style="margin-top: 10px;margin-left: 150px" ng-repeat="x in results">
+                <div name="searchResult">
+                    <div style="margin-bottom: 15px">
+                        <h4 style="color: #0018c3">
+                            <a href="{{x.url}}"><span ng-bind-html="parseMyHTML(x.title)"
+                                                      style="text-decoration: underline"></span></a>
                         </h4>
+                        <div>
+                            <img ng-if="x.hasPic" src="{{x.pic}}" align="left"
+                                 style="margin-right: 10px;width: auto;height: auto;max-width: 150px;max-height: 100px"/>
+                            <div style="color: #0018c3">
+                                <span ng-bind-html="parseMyHTML(x.summary)"></span>
+                            </div>
+                        </div>
+                        <a style="color: green" href="{{x.url}}">{{x.source}}</a> -
+                        <span>{{x.timestamp | date:'yyyy-MM-dd hh:mm'}}</span>
+                        <a style="color: gray" href="{{x.url}}">网页快照</a>
                     </div>
-                    <div id="{{x.id}}" class="panel-collapse collapse">
-                        <div class="panel-body">
-                            <h5 style="color: #0018c3" ng-repeat="y in x.sameData.data">
-                                <a href="{{y.url}}"><span ng-bind-html="parseMyHTML(y.title)"
-                                                          style="text-decoration: underline">{{y.title}}</span></a>
-                            </h5>
+                </div>
+                <div ng-if="x.hasSame" name="sameResult" style="padding-top: 10px">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion"
+                                   href="#{{x.id}}">
+                                    查看与该条搜索结果相似的<span style="color: red">&nbsp;{{x.sameData.count}}&nbsp;</span>条结果
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="{{x.id}}" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <h5 style="color: #0018c3" ng-repeat="y in x.sameData.data">
+                                    <a href="{{y.url}}"><span ng-bind-html="parseMyHTML(y.title)"
+                                                              style="text-decoration: underline">{{y.title}}</span></a>
+                                </h5>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="col-md-6 column">
+            </div>
         </div>
-        <div class="col-md-6 column">
+        <div>
+            <div id="pagebar" class="col-md-6 column" style="margin-top: 10px;margin-left: 150px">
+                <ul class="pagination pagination-lg">
+                    <li ng-repeat="page in pageOjbs" id="{{page.id}}"><a href="#" ng-click="GoPage($event.target)">{{page.text}}</a></li>
+                </ul>
+            </div>
+            <div class="col-md-6 column"></div>
         </div>
     </div>
-</div>
 </div>
 <script type="text/javascript">
     var app = angular.module('mainapp', []);
     app.controller('mainCtrl', function ($scope, $http, $sce, $interval, $timeout) {
+            $scope.pageSize = 20;
+            //TODO：BUG-返回空结果或返回结果不足一页时，页码生成异常
+            $scope.refreshPageBar = function refreshPageBar() {
+                var startPage = $scope.currPage;
+                var endPage = $scope.currPage;
+                if (endPage + 9 > $scope.pageCount) {
+                    endPage = $scope.pageCount;
+                }
+                else {
+                    endPage = endPage + 9;
+                }
+                $scope.pageOjbs = new Array();
+                var preBtn = new Object();
+                preBtn.id = "preBtn";
+                preBtn.text = "上一页";
+                $scope.pageOjbs.push(preBtn);
+                for (var i = startPage; i <= endPage; i++) {
+                    var pageObj = new Object();
+                    pageObj.text = i;
+                    pageObj.id = "pageId" + i;
+                    $scope.pageOjbs.push(pageObj);
+                }
+                var nextBtn = new Object();
+                nextBtn.id = "nextBtn";
+                nextBtn.text = "下一页";
+                $scope.pageOjbs.push(nextBtn);
+                $timeout(function () {
+                    if ($scope.currPage === 1) {
+                        $("#preBtn").hide();
+                    }
+                    if ($scope.pageCount === $scope.currPage) {
+                        $("#nextBtn").hide();
+                    }
+                    $("#pageId" + startPage).attr("class", "active");
+                }, 100);
+            };
+            $scope.GoPage = function (target) {
+                alert($(target).text());
+                var text = $(target).text();
+                if (text === "上一页") {
+                    $scope.currPage--;
+                    $scope.doSearch($scope.currPage, $scope.pageSize);
+                }
+                else if (text === "下一页") {
+                    $scope.currPage++;
+                    $scope.doSearch($scope.currPage, $scope.pageSize);
+                }
+                else {
+                    $scope.currPage = Number(text);
+                    $scope.doSearch($scope.currPage, $scope.pageSize);
+                }
+                $scope.refreshPageBar();
+            };
             $scope.parseMyHTML = function (html) {
                 return $sce.trustAsHtml(html);
             };
@@ -108,7 +170,7 @@
                     method: 'GET',
                     url: '/keywords/get',
                     params: {
-                        key : $("#keywords").val()
+                        key: $("#keywords").val()
                     }
                 }).then(function success(data) {
                     data.data.suggestions.forEach(function (curr) {
@@ -118,23 +180,19 @@
                     alert('连接服务器失败');
                 });
             };
-            $scope.search = function search() {
+            $scope.doSearch = function doSearch(pageIndex, pageSize) {
                 var keyword = $("#keywords").val();
-                $http({
-                    method: 'GET',
-                    url: '/keyword/put',
-                    params: {
-                        key : keyword
-                    }
-                });
                 $http({
                     method: 'GET',
                     url: '/search',
                     params: {
-                        query : keyword
+                        query: keyword,
+                        pageIndex: pageIndex,
+                        pageSize: pageSize
                     }
                 }).then(function success(data) {
                     $scope.results = data.data.data;
+                    $scope.pageCount = data.data.count / $scope.pageSize;
                     if ($scope.results === null) {
                         $scope.results = [];
                     }
@@ -173,6 +231,19 @@
                 }, function error() {
                     alert('连接服务器失败');
                 });
+            };
+            $scope.search = function search() {
+                var keyword = $("#keywords").val();
+                $http({
+                    method: 'GET',
+                    url: '/keyword/put',
+                    params: {
+                        key: keyword
+                    }
+                });
+                $scope.currPage = 1;
+                $scope.doSearch($scope.currPage, $scope.pageSize);
+                $scope.refreshPageBar();
             }
         }
     );

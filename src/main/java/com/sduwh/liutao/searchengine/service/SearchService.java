@@ -72,15 +72,12 @@ public class SearchService {
             List<SearchData> sameData = new ArrayList<>();
             if (sameRecords != null && !sameRecords.isEmpty()) {
                 for (SameRecord sameRecord : sameRecords) {
-                    if (sameRecord.getHammingDis() > 3) {
-                        continue;
-                    }
                     sameData.add(searchDataRepository.findById(sameRecord.getSameId()).orElse(null));
                 }
             }
             results.add(new SearchResultBuilder().build(orderData, sameData));
         }
-        return new SearchResultsBuilder().build(results);
+        return new SearchResultsBuilder().build(results, orderList.size());
     }
 
 }

@@ -60,7 +60,7 @@ public class TestController {
         sameResultsOut.setData(sameList);
         s1.setSameData(sameResultsOut);
         s2.setSameData(sameResultsOut);
-        return new SearchResultsBuilder().build(list, sameList);
+        return new SearchResultsBuilder().build(list, sameList, 4);
     }
 
     @RequestMapping(value = "/test/suggest", method = RequestMethod.GET)

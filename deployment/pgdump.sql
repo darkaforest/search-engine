@@ -175,8 +175,8 @@ ALTER TABLE public.s_search_data OWNER TO root;
 
 CREATE TABLE public.s_search_history (
   id character(36) NOT NULL,
-  ip character varying(15),
-  "time" bigint,
+  s_ip character varying(15),
+  s_time bigint,
   k_content character varying(64)
 );
 

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * Created by IntelliJ IDEA 2018.1.5 (Ultimate Edition)
  * JRE: 1.8.0_172-release-1136-b39 x86_64
@@ -30,7 +32,7 @@ public class SearchController {
     private SearchService searchService;
 
     @RequestMapping(value = "/search", method = RequestMethod.GET)
-    public SearchResultsOut search(@RequestParam(name = "query", required = false) String query, @RequestParam(name = "pageIndex", required = false) Integer pageIndex, @RequestParam(name = "pageSize", required = false) Integer pageSize) {
+    public SearchResultsOut search(@RequestParam(name = "query", required = false) String query, @RequestParam(name = "pageIndex", required = false) Integer pageIndex, @RequestParam(name = "pageSize", required = false) Integer pageSize, HttpServletRequest request) {
         log.info("[search] search with : {}", query);
         if (StringUtils.isEmpty(query)) {
             return new SearchResultsOut();
@@ -41,7 +43,7 @@ public class SearchController {
         if (pageSize == null || pageSize < 1) {
             pageSize = DEFAULT_PAGE_SIZE;
         }
-        return searchService.search(query, pageIndex, pageSize);
+        return searchService.search(query, pageIndex, pageSize, request.getRemoteAddr());
     }
 
 }

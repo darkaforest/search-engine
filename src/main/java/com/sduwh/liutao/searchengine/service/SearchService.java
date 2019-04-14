@@ -4,8 +4,10 @@ import com.sduwh.liutao.searchengine.builder.SearchResultBuilder;
 import com.sduwh.liutao.searchengine.builder.SearchResultsBuilder;
 import com.sduwh.liutao.searchengine.dao.SameRecordRepository;
 import com.sduwh.liutao.searchengine.dao.SearchDataRepository;
+import com.sduwh.liutao.searchengine.dao.SearchHistoryRepository;
 import com.sduwh.liutao.searchengine.entity.SameRecord;
 import com.sduwh.liutao.searchengine.entity.SearchData;
+import com.sduwh.liutao.searchengine.entity.SearchHistory;
 import com.sduwh.liutao.searchengine.model.SearchResultOut;
 import com.sduwh.liutao.searchengine.model.SearchResultsOut;
 import org.apache.commons.lang3.StringUtils;
@@ -29,13 +31,18 @@ public class SearchService {
 
     private static final String SPLITER = " ";
 
+    private static final int IPV4_MAX_LEN = 15;
+
     @Autowired
     private SearchDataRepository searchDataRepository;
 
     @Autowired
     private SameRecordRepository sameRecordRepository;
 
-    public SearchResultsOut search(String query, Integer pageIndex, Integer pageSize) {
+    @Autowired
+    private SearchHistoryRepository searchHistoryRepository;
+
+    public SearchResultsOut search(String query, Integer pageIndex, Integer pageSize, String ip) {
         //TO DO  匹配度算法有问题，应该统计出现次数而不是是否出现，考虑效率问题暂todo
         if (StringUtils.isEmpty(query)) {
             return new SearchResultsOut();
@@ -77,7 +84,15 @@ public class SearchService {
             }
             results.add(new SearchResultBuilder().build(orderData, sameData));
         }
+        saveHistory(ip, query);
         return new SearchResultsBuilder().build(results, orderList.size());
+    }
+
+    private void saveHistory(String ip, String content) {
+        if (StringUtils.isEmpty(ip) || ip.length() > IPV4_MAX_LEN || StringUtils.isEmpty(content)) {
+            return;
+        }
+        searchHistoryRepository.save(new SearchHistory(ip, System.currentTimeMillis(), content));
     }
 
 }

@@ -20,4 +20,7 @@ public interface RawDataRepository extends JpaRepository<RawData, String> {
     @Query(value = "select id from s_raw_data", nativeQuery = true)
     List<Object> findAllId();
 
+    @Query
+    RawData findByUrl(String url);
+
 }

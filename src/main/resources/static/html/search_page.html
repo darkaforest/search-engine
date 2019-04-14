@@ -164,8 +164,24 @@
                 return originList;
             };
             $scope.suggest = function suggest() {
+                var keyword = $("#keywords").val();
                 var selectDom = $("#list");
                 selectDom.empty();
+                var storage=window.localStorage;
+                var localData={
+                    count: 0,
+                    keywords: []
+                };
+                if (keyword === "" || keyword === null || keyword === undefined) {
+                    if (storage.getItem("localData") === null) {
+                        storage.setItem("localData", JSON.stringify(localData));
+                        return;
+                    }
+                    localData = JSON.parse(storage.getItem("localData"));
+                    localData.keywords.forEach(function (curr) {
+                        selectDom.append("<option value=" + curr + "></option>")
+                    });
+                }
                 $http({
                     method: 'GET',
                     url: '/keywords/get',
@@ -173,6 +189,9 @@
                         key: $("#keywords").val()
                     }
                 }).then(function success(data) {
+                    if (data.data.suggestions === null) {
+                        return;
+                    }
                     data.data.suggestions.forEach(function (curr) {
                         selectDom.append("<option value=" + curr + "></option>")
                     });
@@ -234,6 +253,31 @@
             };
             $scope.search = function search() {
                 var keyword = $("#keywords").val();
+                var storage=window.localStorage;
+                if (keyword !== "" && keyword !== null && keyword !==undefined) {
+                    if(window.localStorage){
+                        var localData={
+                            count: 0,
+                            keywords: []
+                        };
+                        if (storage.getItem("localData") === null) {
+                            storage.setItem("localData", JSON.stringify(localData));
+                        }
+                        localData = JSON.parse(storage.getItem("localData"));
+                        for (var i = 0; i < localData.keywords.length; i++) {
+                            if (localData.keywords[i] === keyword) {
+                                localData.keywords.splice(i, 1);
+                            }
+                        }
+                        localData.keywords.unshift(keyword);
+                        localData.count = localData.keywords.length;
+                        if (localData.count > 8) {
+                            localData.keywords.pop();
+                            localData.count -= 1;
+                        }
+                        storage.setItem("localData", JSON.stringify(localData));
+                    }
+                }
                 $http({
                     method: 'GET',
                     url: '/keyword/put',

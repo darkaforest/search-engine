@@ -74,8 +74,25 @@ public class SearchService {
         int toIndex = startIndex + pageSize > orderList.size() ? orderList.size() : startIndex + pageSize;
         List<SearchData> view = orderList.subList(startIndex, toIndex);
         List<SearchResultOut> results = new ArrayList<>();
-        for (SearchData orderData : view) {
+        Iterator<SearchData> iterator = view.iterator();
+        List<String> sameIds = new ArrayList<>();
+        while (iterator.hasNext()) {
+            SearchData orderData = iterator.next();
             List<SameRecord> sameRecords = sameRecordRepository.findByOrOriginId(orderData.getId());
+            for (SameRecord sames : sameRecords) {
+                sameIds.add(sames.getSameId());
+            }
+            boolean duplicate = false;
+            for (String sameId : sameIds) {
+                if (orderData.getId().equals(sameId)) {
+                    iterator.remove();
+                    duplicate = true;
+                    break;
+                }
+            }
+            if (duplicate) {
+                continue;
+            }
             List<SearchData> sameData = new ArrayList<>();
             if (sameRecords != null && !sameRecords.isEmpty()) {
                 for (SameRecord sameRecord : sameRecords) {

@@ -75,7 +75,7 @@
         <div>
             <div id="pagebar" class="col-md-6 column" style="margin-top: 10px;margin-left: 150px">
                 <ul class="pagination pagination-lg">
-                    <li ng-repeat="page in pageOjbs" id="{{page.id}}"><a href="#" target="_blank" ng-click="GoPage($event.target)">{{page.text}}</a></li>
+                    <li ng-repeat="page in pageOjbs" id="{{page.id}}"><a href="#" ng-click="GoPage($event.target)">{{page.text}}</a></li>
                 </ul>
             </div>
             <div class="col-md-6 column"></div>
@@ -122,7 +122,6 @@
                 }, 100);
             };
             $scope.GoPage = function (target) {
-                alert($(target).text());
                 var text = $(target).text();
                 if (text === "上一页") {
                     $scope.currPage--;

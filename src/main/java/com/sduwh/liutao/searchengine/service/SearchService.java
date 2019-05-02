@@ -10,6 +10,7 @@ import com.sduwh.liutao.searchengine.entity.SearchData;
 import com.sduwh.liutao.searchengine.entity.SearchHistory;
 import com.sduwh.liutao.searchengine.model.SearchResultOut;
 import com.sduwh.liutao.searchengine.model.SearchResultsOut;
+import com.sduwh.liutao.searchengine.utils.ContentUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -43,7 +44,6 @@ public class SearchService {
     private SearchHistoryRepository searchHistoryRepository;
 
     public SearchResultsOut search(String query, Integer pageIndex, Integer pageSize, String ip) {
-        //TO DO  匹配度算法有问题，应该统计出现次数而不是是否出现，考虑效率问题暂todo
         if (StringUtils.isEmpty(query)) {
             return new SearchResultsOut();
         }
@@ -61,9 +61,7 @@ public class SearchService {
                 if (preTitle.contains(keyword)) {
                     count += 100;
                 }
-                if (preContent.contains(keyword)) {
-                    count += 1;
-                }
+                count += ContentUtils.apperCount(preContent, keyword);
             }
             preData.setRelevancy(count);
             orderList.add(preData);

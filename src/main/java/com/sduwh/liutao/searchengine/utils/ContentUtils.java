@@ -25,4 +25,14 @@ public class ContentUtils {
         }
     }
 
+    public static int apperCount(String src, String sub) {
+        int index = 0;
+        int count = 0;
+        while((index = src.indexOf(sub, index)) != -1) {
+            count++;
+            index = index + sub.length();
+        }
+        return count;
+    }
+
 }

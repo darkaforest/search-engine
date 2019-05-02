@@ -30,7 +30,7 @@ import java.util.*;
 @Component
 public class BuildService {
 
-    private static final int HAMMING_DISTANCE_LIMIT = 0;
+    private static final int HAMMING_DISTANCE_LIMIT = 1;
 
     private static final int SPAM_LIMIT = 5;
 

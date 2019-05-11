@@ -77,4 +77,8 @@ public class KeyWordService {
         return new SuggestionsBuilder().build(results);
     }
 
+    public List<KeyWordData> getAllKeyWords() {
+        return keyWordRepository.findAll();
+    }
+
 }

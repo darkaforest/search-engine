@@ -11,6 +11,7 @@ import com.sduwh.liutao.searchengine.entity.SearchHistory;
 import com.sduwh.liutao.searchengine.model.SearchResultOut;
 import com.sduwh.liutao.searchengine.model.SearchResultsOut;
 import com.sduwh.liutao.searchengine.utils.ContentUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,11 +29,15 @@ import java.util.*;
  */
 
 @Component
+@Slf4j
 public class SearchService {
 
     private static final String SPLITER = " ";
 
     private static final int IPV4_MAX_LEN = 15;
+
+    @Autowired
+    private CacheService cacheService;
 
     @Autowired
     private SearchDataRepository searchDataRepository;
@@ -47,7 +52,12 @@ public class SearchService {
         if (StringUtils.isEmpty(query)) {
             return new SearchResultsOut();
         }
-        List<SearchData> preList = searchDataRepository.findByTextSearch(query);
+        //refresh ttl or put cache if not exists
+        List<SearchData> preList = cacheService.getSearchData(query);
+        if (preList == null) {
+            preList = searchDataRepository.findByTextSearch(query);
+            cacheService.putSearchData(query, preList);
+        }
         List<SearchData> orderList = new ArrayList<>();
         String[] keywords = query.split(SPLITER);
         for (SearchData preData : preList) {

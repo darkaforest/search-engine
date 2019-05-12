@@ -52,6 +52,11 @@ public class SearchService {
         if (StringUtils.isEmpty(query)) {
             return new SearchResultsOut();
         }
+        //quick cache
+        SearchResultsOut cache = cacheService.getPageData(query, pageIndex);
+        if (cache != null) {
+            return cache;
+        }
         //refresh ttl or put cache if not exists
         List<SearchData> preList = cacheService.getSearchData(query);
         if (preList == null) {
@@ -110,7 +115,9 @@ public class SearchService {
             results.add(new SearchResultBuilder().build(orderData, sameData));
         }
         saveHistory(ip, query);
-        return new SearchResultsBuilder().build(results, orderList.size());
+        SearchResultsOut resultsOut = new SearchResultsBuilder().build(results, orderList.size());
+        cacheService.putPageData(query, resultsOut, pageIndex);
+        return resultsOut;
     }
 
     private void saveHistory(String ip, String content) {

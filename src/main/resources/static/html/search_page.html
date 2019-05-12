@@ -19,7 +19,7 @@
                     <img src="logo.jpeg" width="100%"/>
                 </div>
                 <div class="col-md-5 column">
-                    <input ng-change="suggest()" ng-model="keyWords" list="list" id="keywords" type="text"
+                    <input ng-focus="suggest()" ng-change="suggest()" ng-model="keyWords" list="list" id="keywords" type="text"
                            class="form-control input-lg" autocomplete="off">
                     <datalist id="list"></datalist>
                 </div>
@@ -86,7 +86,6 @@
     var app = angular.module('mainapp', []);
     app.controller('mainCtrl', function ($scope, $http, $sce, $interval, $timeout) {
             $scope.pageSize = 20;
-            //TODO：BUG-返回空结果或返回结果不足一页时，页码生成异常
             $scope.refreshPageBar = function refreshPageBar() {
                 var startPage = $scope.currPage;
                 var endPage = $scope.currPage;
@@ -112,6 +111,12 @@
                 nextBtn.text = "下一页";
                 $scope.pageOjbs.push(nextBtn);
                 $timeout(function () {
+                    if ($scope.ccount <= $scope.pageSize) {
+                        $("#pagebar").hide();
+                    }
+                    else {
+                        $("#pagebar").show();
+                    }
                     if ($scope.currPage === 1) {
                         $("#preBtn").hide();
                     }
@@ -135,7 +140,6 @@
                     $scope.currPage = Number(text);
                     $scope.doSearch($scope.currPage, $scope.pageSize);
                 }
-                $scope.refreshPageBar();
             };
             $scope.parseMyHTML = function (html) {
                 return $sce.trustAsHtml(html);
@@ -174,12 +178,14 @@
                 if (keyword === "" || keyword === null || keyword === undefined) {
                     if (storage.getItem("localData") === null) {
                         storage.setItem("localData", JSON.stringify(localData));
-                        return;
                     }
-                    localData = JSON.parse(storage.getItem("localData"));
-                    localData.keywords.forEach(function (curr) {
-                        selectDom.append("<option value=" + curr + "></option>")
-                    });
+                    else {
+                        localData = JSON.parse(storage.getItem("localData"));
+                        localData.keywords.forEach(function (curr) {
+                            selectDom.append("<option value=" + curr + "></option>")
+                        });
+                    }
+                    return;
                 }
                 $http({
                     method: 'GET',
@@ -210,7 +216,11 @@
                     }
                 }).then(function success(data) {
                     $scope.results = data.data.data;
-                    $scope.pageCount = data.data.count / $scope.pageSize;
+                    $scope.ccount = data.data.count;
+                    $scope.pageCount = Math.ceil(data.data.count / $scope.pageSize);
+                    if ($scope.pageCount < 1) {
+                        $scope.pageCount = 1;
+                    }
                     if ($scope.results === null) {
                         $scope.results = [];
                     }
@@ -246,6 +256,7 @@
                         curr.summary = $scope.makeKeywordsRed(curr.summary, keywordList);
                         curr.id = index;
                     });
+                    $scope.refreshPageBar();
                 }, function error() {
                     alert('连接服务器失败');
                 });
@@ -286,7 +297,6 @@
                 });
                 $scope.currPage = 1;
                 $scope.doSearch($scope.currPage, $scope.pageSize);
-                $scope.refreshPageBar();
             };
             $scope.snap = function (url) {
                 window.localStorage.setItem("snapUrl", url);

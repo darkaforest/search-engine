@@ -182,7 +182,7 @@
                     else {
                         localData = JSON.parse(storage.getItem("localData"));
                         localData.keywords.forEach(function (curr) {
-                            selectDom.append("<option value=" + curr + "></option>")
+                            selectDom.append("<option value=" + curr.replace(/\s/g,"&nbsp;") + "></option>")
                         });
                     }
                     return;
@@ -198,7 +198,7 @@
                         return;
                     }
                     data.data.suggestions.forEach(function (curr) {
-                        selectDom.append("<option value=" + curr + "></option>")
+                        selectDom.append("<option value=" + curr.replace(/\s/g,"&nbsp;") + "></option>")
                     });
                 }, function error() {
                     alert('连接服务器失败');
